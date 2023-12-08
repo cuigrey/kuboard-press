@@ -1,0 +1,30 @@
+#sudo docker run -d --restart=unless-stopped --name=kuboard -p 8101:80/tcp -p 10081:10081/tcp 
+#-e KUBOARD_ENDPOINT="http://172.16.10.169:8101" -e KUBOARD_AGENT_SERVER_TCP_PORT="10081" -e KUBOARD_ETCD_ENDPOINTS=[172.16.10.169:2379] -v /root/kuboard-data:/data eipwork/kuboard:v3
+#  # 也可以使用镜像 swr.cn-east-2.myhuaweicloud.com/kuboard/kuboard:v3 ，可以更快地完成镜像下载。
+#  # 请不要使用 127.0.0.1 或者 localhost 作为内网 IP \
+#  # Kuboard 不需要和 K8S 在同一个网段，Kuboard Agent 甚至可以通过代理访问 Kuboard Server \
+
+
+version: "3"
+services:
+  kuboard:
+    image: eipwork/kuboard:v3
+    restart: unless-stopped
+    environment:
+      - KUBOARD_ENDPOINT=http://172.16.10.169:8101
+      - KUBOARD_AGENT_SERVER_TCP_PORT=10081
+      - KUBOARD_ETCD_ENDPOINTS=172.16.10.169:2379
+    volumes:
+      - kuboard:/data
+    ports:
+      - 8101:80/tcp
+      - 10081:10081/tcp
+    networks:
+      - net_standalone-dev-net
+
+volumes:
+  kuboard:
+
+networks:
+  net_standalone-dev-net:
+    external: true
